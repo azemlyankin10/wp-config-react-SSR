@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-undef */
 const path = require('path')
 const nodeExternals = require('webpack-node-externals')
-const NODE_ENV = process.env.NODE_ENV;
-const GLOBAL_CSS_REGEXP = /\.global\.css$/
-
+const NODE_ENV = process.env.NODE_ENV
+const { DefinePlugin } = require('webpack')
 
 module.exports = {
   target:'node',
@@ -19,32 +20,21 @@ module.exports = {
   module:{
     rules:[
       {
+        test: /\.(gif|svg|jpg|jpeg|png)$/,
+        loader: 'file-loader',
+      },
+      {
         test:/\.[tj]sx?$/,
         use:['ts-loader']
       },
       {
-        test:/\.css$/,
-        use:[ 
-          {
-            loader:'css-loader',
-            options:{
-              modules:{
-                mode:'local',
-                localIdentName:'[name]__[local]--[hash:base64:5]',
-              },
-              onlyLocals:true
-            }
-          },
-        ],
-        exclude: GLOBAL_CSS_REGEXP
+        test: /\.s[ac]ss$/i,
+        use:['css-loader', 'sass-loader'],
       },
-      {
-        test: GLOBAL_CSS_REGEXP,
-        use: ['css-loader']
-      }
     ]
   },
   optimization: {
     minimize: false
-  }
+  },
+  plugins: [ new DefinePlugin({ 'process.env.CLIENT_ID': `'${process.env.CLIENT_ID}'` }) ]
 }
